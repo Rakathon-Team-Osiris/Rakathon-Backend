@@ -1,6 +1,5 @@
 from pinecone import Pinecone
 
-pc = Pinecone(api_key="97cc1ea8-d32a-4966-82ed-22e191ba93ec")
 index = pc.Index("slay-vector-db")
 
 array =[]
