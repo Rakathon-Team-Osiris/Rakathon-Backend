@@ -9,13 +9,15 @@ cursor.execute("PRAGMA foreign_keys = ON")
 
 # Create Users DB table
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Users (
-        UUID TEXT PRIMARY KEY,
-        user_role TEXT,
-        username TEXT UNIQUE,
-        password TEXT,
-        skin_analysis TEXT
-    )
+    CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            phone_number TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            image TEXT,
+            skin_tone TEXT
+        )
 ''')
 
 # Create Image DB table

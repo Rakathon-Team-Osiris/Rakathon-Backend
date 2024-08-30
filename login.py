@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
 import skin_tone_analysis 
+import security
 
 app = Flask(__name__)
 CORS(app)  
@@ -9,6 +10,7 @@ CORS(app)
 def insert_user(name, phone_number, email, password, image):
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
+    password=security.caesar_cipher_with_salt(password, key=4)
     skin_tone = skin_tone_analysis.analyze_skin_tone(image)['Colour Palette']
     c.execute('''
         INSERT INTO users (name, phone_number, email, password, image, skin_tone)
