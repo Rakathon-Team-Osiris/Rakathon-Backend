@@ -3,15 +3,28 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
+from PIL import Image
+import io
 
+# Load environment variables from .env file
 load_dotenv()
 
 # OpenAI API Key
 api_key = os.getenv("OPENAI_API_KEY")
 
-def encode_image(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+def encode_image(image_path, max_size=(800, 800), quality=75):
+    # Open the image file
+    with Image.open(image_path) as image:
+        # Resize the image if it is larger than max_size
+        image.thumbnail(max_size)
+        
+        # Save the image to a BytesIO object with compression
+        buffered = io.BytesIO()
+        image.save(buffered, format="JPEG", quality=quality)
+        
+        # Encode the image to base64
+        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        return img_base64
 
 def analyze_skin_tone(image_path):
     # Define the prompt for the API
@@ -46,18 +59,11 @@ def analyze_skin_tone(image_path):
         "messages": [
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": prompt
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"
-                        }
-                    }
-                ]
+                "content": prompt
+            },
+            {
+                "role": "user",
+                "content": f"data:image/jpeg;base64,{base64_image}"
             }
         ],
         "max_tokens": 1000
@@ -70,7 +76,25 @@ def analyze_skin_tone(image_path):
     if response.status_code == 200:
         response_json = response.json()
         content = response_json['choices'][0]['message']['content']
-        return content
+
+        # Parse the content to JSON format
+        try:
+            result = json.loads(content)
+        except json.JSONDecodeError:
+            print("Failed to parse JSON from the response.")
+            result = None
+
+        return result
     else:
         print(f"Request failed with status code {response.status_code}")
+        print(response.text)
         return None
+
+image_path = "pexels-kowalievska-1055691.jpg"
+output = analyze_skin_tone(image_path=image_path)
+
+# Print the final output
+if output:
+    print(json.dumps(output, indent=4))
+else:
+    print("No output received.")

@@ -16,7 +16,7 @@ app = Flask(__name__)
 # OpenAI API Key
 api_key = os.getenv("OPENAI_API_KEY")
 
-def encode_image(image_path, max_size=(800, 800), quality=75):
+def encode_image(image_path, max_size=(600, 600), quality=65):
     with Image.open(image_path) as image:
         image.thumbnail(max_size)
         buffered = io.BytesIO()
@@ -95,4 +95,4 @@ def analyze_skin_tone_endpoint():
         return jsonify({"error": "Failed to analyze the image"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8001)

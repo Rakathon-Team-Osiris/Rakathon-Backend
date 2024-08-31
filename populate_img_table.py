@@ -42,7 +42,7 @@ source_cursor.execute("SELECT uniq_id, product_name, image, description, tertiar
 rows = source_cursor.fetchall()
 
 # Insert the selected data into the images table in slay.db
-for row in tqdm(rows[:10], desc="Processing rows", unit="row"):
+for row in tqdm(rows, desc="Processing rows", unit="row"):
     uniq_id, product_name, image_path, description, category,  = row
     image_path = fetch_first_url(image_path)
     # Extract the color from the image
